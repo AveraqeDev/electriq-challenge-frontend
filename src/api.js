@@ -1,4 +1,4 @@
-import { API_ENDPOINT } from './config';
+import config from './config';
 
 /**
  * A Wrapper function for 'fetch' to easily handle errors
@@ -38,7 +38,7 @@ function apiFetch(...args) {
  * Get the list of products from the server
  */
 function getProducts() {
-  return apiFetch(`${API_ENDPOINT}/products`);
+  return apiFetch(`${config.API_ENDPOINT}/products`);
 }
 
 export default {

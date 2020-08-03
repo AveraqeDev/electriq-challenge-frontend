@@ -1,5 +1,4 @@
 import $ from 'jquery';
-import api from './api';
 import store from './store';
 
 /**
@@ -7,7 +6,13 @@ import store from './store';
  * @param {Object} product
  */
 function generateProductElement(product) {
-  
+  return `
+    <div class="product" data-product-id="${product.id}">
+      <img src=${product.image.src} alt=${product.title} />
+      <span class="product_name">${product.title}</span>
+      <span class="product_price">${product.variants[0].price}</span>
+    </div>
+  `;
 }
 
 /**
@@ -53,7 +58,7 @@ function renderError() {
 }
 
 /**
- * Renders the Application to the browser window
+ * Renders products to the browser window
  */
 function render() {
   let html = '';
@@ -62,9 +67,9 @@ function render() {
 
   let products = [...store.products];
   if(store.filter === 'price_ascending') {
-    products.sort((a, b) => a.variants.price - b.variants.price);
+    products.sort((a, b) => a.variants[0].price - b.variants[0].price);
   } else if(store.filter === 'price_descending') {
-    products.sort((a, b) => b.variants.price - a.variants.price);
+    products.sort((a, b) => b.variants[0].price - a.variants[0].price);
   } else {
     products.sort((a, b) => a.title - b.title);
   }
@@ -79,11 +84,12 @@ function render() {
  */
 
 /**
- * Handles when the "Buy Now' Button is clicked on a product"
+ * Handles when a product is clicked"
  */
-function handleBuyClicked() {
-  $('.buynow-button').click(event => {
-    
+function handleProductClicked() {
+  $('.product-container').on('click', '.product', event => {
+    let product = store.findById(getIdFromElement(event.currentTarget));
+    alert(`Clicked on ${product.title}`);
   });
 }
 
@@ -94,14 +100,21 @@ function handleFilterChange() {
   $('.filter-price').click(event => {
     if(store.filter === 'price_ascending') {
       store.filter = 'price_descending';
+      $('.filter-price').html('Price ▼');
+      $('.filter-name').html('Name');
     } else {
       store.filter = 'price_ascending';
+      $('.filter-price').html('Price ▲');
+      $('.filter-name').html('Name');
     }
+    render();
   });
 
   $('.filter-name').click(event => {
     event.preventDefault();
     store.filter = 'name';
+    $('.filter-name').html('Name ▲');
+    $('.filter-price').html('Price');
     render();
   });
 }
@@ -120,7 +133,7 @@ function handleErrorClose() {
  * Runs all Event Listener functions to start Listening
  */
 function bindEventListeners() {
-  handleBuyClicked();
+  handleProductClicked();
   handleFilterChange();
   handleErrorClose();
 }
